@@ -310,9 +310,9 @@
         const defectiveParts = parseFloat(document.getElementById('defective-parts').value) || 0;
 
         // Calculations
-        const plannedProductionTime = shiftLength - plannedDowntime;
-        const operatingTime = plannedProductionTime - unplannedDowntime;
-        const goodParts = totalParts - defectiveParts;
+        const plannedProductionTime = Math.max(0, shiftLength - plannedDowntime);
+        const operatingTime = Math.max(0, plannedProductionTime - unplannedDowntime);
+        const goodParts = Math.max(0, totalParts - defectiveParts);
 
         let availability = 0;
         if (plannedProductionTime > 0) {
@@ -323,7 +323,6 @@
         if (operatingTime > 0) {
             // Convert cycle time to minutes
             const idealCycleTimeMin = idealCycleTimeSec / 60;
-            // performance can sometimes exceed 100% if ideal cycle time is wrong, we'll cap it at 1 for standard OEE
             performance = (totalParts * idealCycleTimeMin) / operatingTime;
             // Cap at 1 (100%) for visual standard
             if (performance > 1) performance = 1;
@@ -334,6 +333,7 @@
             quality = goodParts / totalParts;
         }
 
+        // Final OEE
         const oee = availability * performance * quality;
 
         // Formatting
